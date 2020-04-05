@@ -40,13 +40,13 @@ def compare_strength(h1,h2):
     h1_straight_flush=True
     for i in range(1,5):
         if h1_suites[i]!= h1_suites[i-1] or h1_faces[i]-h1_faces[i-1]!=1:
-            h1_stright_flush=False
+            h1_straight_flush=False
             break
 
     h2_straight_flush=True
     for i in range(1,5):
         if h2_suites[i]!= h2_suites[i-1] or h2_faces[i]-h2_faces[i-1]!=1:
-            h2_stright_flush=False
+            h2_straight_flush=False
             break
 
     if h1_straight_flush and not h2_straight_flush:
@@ -153,12 +153,8 @@ def compare_strength(h1,h2):
             return (h2_rank > h1_rank)+1
 
     #check for two pairs
-    h1_two_pairs = (all_same(h1_faces[0:2]) and all_same(h1_faces[2:4])) or
-                   (all_same(h1_faces[0:2]) and all_same(h1_faces[3:5])) or
-                   (all_same(h1_faces[1:3]) and all_same(h1_faces[3:5]))
-    h2_two_pairs = (all_same(h2_faces[0:2]) and all_same(h2_faces[2:4])) or
-                   (all_same(h2_faces[0:2]) and all_same(h2_faces[3:5])) or
-                   (all_same(h2_faces[1:3]) and all_same(h2_faces[3:5]))
+    h1_two_pairs = (all_same(h1_faces[0:2]) and all_same(h1_faces[2:4])) or (all_same(h1_faces[0:2]) and all_same(h1_faces[3:5])) or (all_same(h1_faces[1:3]) and all_same(h1_faces[3:5]))
+    h2_two_pairs = (all_same(h2_faces[0:2]) and all_same(h2_faces[2:4])) or (all_same(h2_faces[0:2]) and all_same(h2_faces[3:5])) or (all_same(h2_faces[1:3]) and all_same(h2_faces[3:5]))
     if h1_two_pairs and not h2_two_pairs:
         return 1
     elif h2_two_pairs and not h1_two_pairs:
@@ -184,10 +180,8 @@ def compare_strength(h1,h2):
         return (h2_rank > h1_rank)+1
 
     #check for pair
-    h1_pair = all_same(h1_faces[0:2]) or all_same(h1_faces[1:3]) or
-              all_same(h1_faces[2:4]) or all_same(h1_faces[3:5])
-    h2_pair = all_same(h2_faces[0:2]) or all_same(h2_faces[1:3]) or
-              all_same(h2_faces[2:4]) or all_same(h2_faces[3:5])
+    h1_pair = all_same(h1_faces[0:2]) or all_same(h1_faces[1:3]) or all_same(h1_faces[2:4]) or all_same(h1_faces[3:5])
+    h2_pair = all_same(h2_faces[0:2]) or all_same(h2_faces[1:3]) or all_same(h2_faces[2:4]) or all_same(h2_faces[3:5])
     if h1_pair and not h2_pair:
         return 1
     elif h2_pair and not h1_pair:
@@ -225,27 +219,27 @@ def compare_strength(h1,h2):
                 return (h2_faces[i] > h1_faces[i])+1
 
 def symbol_translator(s):
-    if s[1]=='9':
+    if s[0]=='9':
         face = 'jack'
-    elif s[1]=='a':
+    elif s[0]=='a':
         face = 'queen'
-    elif s[1]=='b':
+    elif s[0]=='b':
         face = 'king'
-    elif s[1]=='c':
+    elif s[0]=='c':
         face = 'ace'
     else:
-        face = str(int(s[1]) + 2)
+        face = str(int(s[0]) + 2)
 
-    suite = ['diamonds','clubs','hearts','spades'][int(s[0])]
+    suite = ['diamonds','clubs','hearts','spades'][int(s[1])]
     return face + " of " + suite
 
 def parse_history(h):
     if len(h)==0:
-        return ("","","")
+        return ("","","","")
     elif len(h)<5:
-        return (h,"","")
+        return (h,"","","")
     elif len(h)<9:
-        return (h[0:4],h[4:],"")
+        return (h[0:4],h[4:],"","")
     h1 = h[0:4]
     h2 = h[4:8]
     preflop = ""
@@ -265,10 +259,9 @@ def parse_history(h):
     return (h1,h2,preflop,flop)
 
 def utility(h):
-    h1,h2,preflop,flop = parse(h)
+    h1,h2,preflop,flop = parse_history(h)
     pot = [0.0,0.0]
     player = 0
-    bets = 0
     for i in range(0,len(preflop),2):
         if preflop[i:i+2] == "ff":
             s = sum(pot)
@@ -310,7 +303,7 @@ def player(h):
     if len(h1)!=4 or len(h2)!=4 or len(h1)!=10:
         return 0
 
-    if flop == ""::
+    if flop == "":
         return (len(preflop)/2 %2)+1
     else:
         return (len(flop)/2 %2)+1
