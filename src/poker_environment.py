@@ -23,14 +23,14 @@ def compare_strength(h1,h2):
     #input hands as strings
     #return 0 if hands are equal
     #else return 1 or 2
-    h1_tmp=[(int(h1[2*i],16),int(h1[2*i+1])) for i in range(5)]
+    h1_tmp=[int(h1[i:i+2]) for i in range(0,10,2)]
     h1_tmp.sort()
-    h1_faces=[i[0] for i in h1_tmp]
-    h1_suites=[i[1] for i in h1_tmp]
-    h2_tmp=[(int(h2[2*i],16),int(h2[2*i+1])) for i in range(5)]
+    h1_faces=[int(i/4) for i in h1_tmp]
+    h1_suites=[i%4 for i in h1_tmp]
+    h2_tmp=[int(h2[i:i+2]) for i in range(0,10,2)]
     h2_tmp.sort()
-    h2_faces=[i[0] for i in h2_tmp]
-    h2_suites=[i[1] for i in h2_tmp]
+    h2_faces=[int(i/4) for i in h2_tmp]
+    h2_suites=[i%4 for i in h2_tmp]
 
     #make sure h1 and h2 are different
     if h1_tmp==h2_tmp:
