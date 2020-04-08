@@ -218,19 +218,9 @@ def compare_strength(h1,h2):
             if h1_faces[i] != h2_faces[i]:
                 return (h2_faces[i] > h1_faces[i])+1
 
-def symbol_translator(s):
-    if s[0]=='9':
-        face = 'jack'
-    elif s[0]=='a':
-        face = 'queen'
-    elif s[0]=='b':
-        face = 'king'
-    elif s[0]=='c':
-        face = 'ace'
-    else:
-        face = str(int(s[0]) + 2)
-
-    suite = ['diamonds','clubs','hearts','spades'][int(s[1])]
+def symbol_translator(x):
+    face=['2','3','4','5','6','7','8','9','10','jack','queen','king','ace'][int(x/4)]
+    suite = ['diamonds','clubs','hearts','spades'][x%4]
     return face + " of " + suite
 
 def parse_history(h):
@@ -300,13 +290,13 @@ def utility(h):
 def player(h):
     #returns 0 for chance node, 1,2 for player otherwise
     h1,h2,preflop,flop = parse_history(h)
-    if len(h1)!=4 or len(h2)!=4 or len(h1)!=10:
-        return 0
-
-    if flop == "":
-        return (len(preflop)/2 %2)+1
+    if len(h1) == 4 or len(h1) == 10:
+        if flop == "":
+            return (len(preflop)/2 %2)+1
+        else:
+            return (len(flop)/2 %2)+1
     else:
-        return (len(flop)/2 %2)+1
+        return 0
 
 def is_terminal(h):
     _,_,preflop,flop = parse_history(h)
@@ -314,20 +304,13 @@ def is_terminal(h):
 
 CARDS=range(52)
 
-def int_to_card(self,x):
-    suite = x % 4
-    face = x / 4
-    return hex(face)[2] + str(suite)
-
-def shuffle_cards():
-    shuffle(CARDS)
-
-def deal_cards(x):
-    s = ""
-    if x == 1:
+def deal_cards(h):
+    s=""
+    if len(h) == 0:
+        shuffle(CARDS)
         for i in range(4):
-            s += int_to_card(CARDS[i:i+2])
-    elif x == 2:
+            s += str(CARDS[i])
+    else:
         for i in range(4,7):
-            s += int_to_card(CARDS[i:i+2])
+            s += str(CARDS[i])
     return s
