@@ -290,11 +290,13 @@ def utility(h):
 def player(h):
     #returns 0 for chance node, 1,2 for player otherwise
     h1,h2,preflop,flop = parse_history(h)
-    if len(h1) == 4 or len(h1) == 10:
-        if flop == "":
-            return (len(preflop)/2 %2)+1
+    if len(h1) == 4:  # in preflop round
+        if len(preflop)==16 or preflop[-2:]=="cc":
+            return 0
         else:
-            return (len(flop)/2 %2)+1
+            return (int(len(preflop)/2) %2)+1
+    elif len(h1) == 10: # in flop round
+        return (int(len(flop)/2) %2)+1
     else:
         return 0
 
