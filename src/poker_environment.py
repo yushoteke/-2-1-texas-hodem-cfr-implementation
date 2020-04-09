@@ -23,14 +23,14 @@ def compare_strength(h1,h2):
     #input hands as strings
     #return 0 if hands are equal
     #else return 1 or 2
-    h1_tmp=[(int(h1[2*i],16),int(h1[2*i+1])) for i in range(5)]
+    h1_tmp=[int(h1[i:i+2]) for i in range(0,10,2)]
     h1_tmp.sort()
-    h1_faces=[i[0] for i in h1_tmp]
-    h1_suites=[i[1] for i in h1_tmp]
-    h2_tmp=[(int(h2[2*i],16),int(h2[2*i+1])) for i in range(5)]
+    h1_faces=[int(i/4) for i in h1_tmp]
+    h1_suites=[i%4 for i in h1_tmp]
+    h2_tmp=[int(h2[i:i+2]) for i in range(0,10,2)]
     h2_tmp.sort()
-    h2_faces=[i[0] for i in h2_tmp]
-    h2_suites=[i[1] for i in h2_tmp]
+    h2_faces=[int(i/4) for i in h2_tmp]
+    h2_suites=[i%4 for i in h2_tmp]
 
     #make sure h1 and h2 are different
     if h1_tmp==h2_tmp:
@@ -454,11 +454,13 @@ def utility(h):
 def player(h):
     #returns 0 for chance node, 1,2 for player otherwise
     h1,h2,preflop,flop = parse_history(h)
-    if len(h1) == 4 or len(h1) == 10:
-        if flop == "":
-            return (len(preflop)/2 %2)+1
+    if len(h1) == 4:  # in preflop round
+        if len(preflop)==16 or preflop[-2:]=="cc":
+            return 0
         else:
-            return (len(flop)/2 %2)+1
+            return (int(len(preflop)/2) %2)+1
+    elif len(h1) == 10: # in flop round
+        return (int(len(flop)/2) %2)+1
     else:
         return 0
 

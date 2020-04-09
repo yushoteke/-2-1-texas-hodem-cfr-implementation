@@ -2,26 +2,19 @@ import poker_environment as pe
 
 def tuple_to_card_number(t):
     if t[1]=="diamonds":
-        return t[0]*16+0
+        return t[0]*4+0
     elif t[1]=="clubs":
-        return t[0]*16+1
+        return t[0]*4+1
     elif t[1]=="hearts":
-        return t[0]*16+2
+        return t[0]*4+2
     elif t[1]=="spades":
-        return t[0]*16+3
-
-def card_number_to_string(n):
-    s=hex(n)
-    if s[-2]=="x":
-        return "0"+s[-1]
-    else:
-        return s[-2:]
+        return t[0]*4+3
 
 def tuples_to_string(a):
     s=""
     for i in a:
-        tmp = tuple_to_card_number(i)
-        s += card_number_to_string(tmp)
+        s += str(tuple_to_card_number(i))
+
     return s
 
 hands=[]
@@ -274,6 +267,7 @@ if strength_test == True:
 else:
     print("compare strength test failed")
 
+''' deprecated because uses old representation
 histories = []
 histories.append("c3")
 histories.append("c3b3")
@@ -303,3 +297,4 @@ utilities.append("c3b3a292"+"b"*16+"112233"+"b"*16)
 for i in utilities:
     print("utility of history "+i+" is")
     print(pe.utility(i))
+'''
