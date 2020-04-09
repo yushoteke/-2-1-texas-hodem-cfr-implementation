@@ -218,6 +218,170 @@ def compare_strength(h1,h2):
             if h1_faces[i] != h2_faces[i]:
                 return (h2_faces[i] > h1_faces[i])+1
 
+def compare_strength_noflush(h1,h2):
+    #input hands as strings
+    #return 0 if hands are equal
+    #else return 1 or 2
+    h1_tmp=[(int(h1[2*i],16),int(h1[2*i+1])) for i in range(5)]
+    h1_tmp.sort()
+    h1_faces=[i[0] for i in h1_tmp]
+    h1_suites=[i[1] for i in h1_tmp]
+    h2_tmp=[(int(h2[2*i],16),int(h2[2*i+1])) for i in range(5)]
+    h2_tmp.sort()
+    h2_faces=[i[0] for i in h2_tmp]
+    h2_suites=[i[1] for i in h2_tmp]
+
+    #make sure h1 and h2 are different
+    if h1_tmp==h2_tmp:
+        return 0
+
+    #check for four of a kind
+    h1_four_of_a_kind = all_same(h1_faces[0:4]) or all_same(h1_faces[1:5])
+    h2_four_of_a_kind = all_same(h2_faces[0:4]) or all_same(h2_faces[1:5])
+    if h1_four_of_a_kind and not h2_four_of_a_kind:
+        return 1
+    elif not h1_four_of_a_kind and h2_four_of_a_kind:
+        return 2
+    elif h1_four_of_a_kind and h2_four_of_a_kind:
+        if h1_faces == h2_faces:
+            return 0
+        elif h1_faces[2]!=h2_faces[2]:
+            return (h2_faces[2]>h1_faces[2])+1
+        else:
+            h1_kicker = h1_faces[4] if h1_faces[4]!=h1_faces[2] else h1_faces[0]
+            h2_kicker = h2_faces[4] if h2_faces[4]!=h2_faces[2] else h2_faces[0]
+            return (h2_kicker > h1_kicker)+1
+
+    #check for full house
+    h1_fullhouse = all_same(h1_faces[0:2]) and all_same(h1_faces[2:5])
+    h2_fullhouse = all_same(h2_faces[0:2]) and all_same(h2_faces[2:5])
+    if h1_fullhouse and not h2_fullhouse:
+        return 1
+    elif h2_fullhouse and not h1_fullhouse:
+        return 2
+    elif h1_fullhouse and h2_fullhouse:
+        if h1_faces == h2_faces:
+            return 0
+        elif h1_faces[2] != h2_faces[2]:
+            return (h2_faces[2] > h1_faces[2])+1
+        else:
+            h1_rank = h1_faces[4] if h1_faces[4]!=h1_faces[2] else h1_faces[0]
+            h2_rank = h2_faces[4] if h2_faces[4]!=h2_faces[2] else h2_faces[0]
+            return (h2_rank > h1_rank)+1
+
+    #check for straight
+    h1_straight = True
+    for i in range(1,5):
+        if h1_faces[i]-h1_faces[i-1]!=1:
+            h1_straight = False
+            break
+    h2_straight = True
+    for i in range(1,5):
+        if h2_faces[i]-h2_faces[i-1]!=1:
+            h2_straight = False
+            break
+    if h1_straight and not h2_straight:
+        return 1
+    elif h2_straight and not h1_straight:
+        return 2
+    elif h1_straight and h2_straight:
+        return (h2_faces[4] > h1_faces[4])+1
+
+    #check for 3 of a kind
+    h1_three_of_a_kind = all_same(h1_faces[0:3]) or all_same(h1_faces[1:4]) or all_same(h1_faces[2:5])
+    h2_three_of_a_kind = all_same(h2_faces[0:3]) or all_same(h2_faces[1:4]) or all_same(h2_faces[2:5])
+    if h1_three_of_a_kind and not h2_three_of_a_kind:
+        return 1
+    elif h2_three_of_a_kind and not h1_three_of_a_kind:
+        return 2
+    elif h1_three_of_a_kind and h2_three_of_a_kind:
+        if h1_faces == h2_faces:
+            return 0
+        elif h1_faces[2] != h2_faces[2]:
+            return (h2_faces[2] > h1_faces[2])+1
+        else:
+            if all_same(h1_faces[0:3]):
+                h1_rank = (h1_faces[4],h1_faces[3])
+            elif all_same(h1_faces[1:4]):
+                h1_rank = (h1_faces[4],h1_faces[0])
+            else:
+                h1_rank = (h1_faces[1],h1_faces[0])
+
+            if all_same(h2_faces[0:3]):
+                h2_rank = (h2_faces[4],h2_faces[3])
+            elif all_same(h2_faces[1:4]):
+                h2_rank = (h2_faces[4],h2_faces[0])
+            else:
+                h2_rank = (h2_faces[1],h2_faces[0])
+
+            return (h2_rank > h1_rank)+1
+
+    #check for two pairs
+    h1_two_pairs = (all_same(h1_faces[0:2]) and all_same(h1_faces[2:4])) or (all_same(h1_faces[0:2]) and all_same(h1_faces[3:5])) or (all_same(h1_faces[1:3]) and all_same(h1_faces[3:5]))
+    h2_two_pairs = (all_same(h2_faces[0:2]) and all_same(h2_faces[2:4])) or (all_same(h2_faces[0:2]) and all_same(h2_faces[3:5])) or (all_same(h2_faces[1:3]) and all_same(h2_faces[3:5]))
+    if h1_two_pairs and not h2_two_pairs:
+        return 1
+    elif h2_two_pairs and not h1_two_pairs:
+        return 2
+    elif h1_two_pairs and h2_two_pairs:
+        if h1_faces == h2_faces:
+            return 0
+
+        if all_same(h1_faces[3:5]) and all_same(h1_faces[1:3]):
+            h1_rank = (h1_faces[3],h1_faces[1],h1_faces[0])
+        elif all_same(h1_faces[3:5]) and all_same(h1_faces[0:2]):
+            h1_rank = (h1_faces[3],h1_faces[1],h1_faces[2])
+        elif all_same(h1_faces[2:4]) and all_same(h1_faces[0:2]):
+            h1_rank = (h1_faces[3],h1_faces[1],h1_faces[4])
+
+        if all_same(h2_faces[3:5]) and all_same(h2_faces[1:3]):
+            h2_rank = (h2_faces[3],h2_faces[1],h2_faces[0])
+        elif all_same(h2_faces[3:5]) and all_same(h2_faces[0:2]):
+            h2_rank = (h2_faces[3],h2_faces[1],h2_faces[2])
+        elif all_same(h2_faces[2:4]) and all_same(h2_faces[0:2]):
+            h2_rank = (h2_faces[3],h2_faces[1],h2_faces[4])
+
+        return (h2_rank > h1_rank)+1
+
+    #check for pair
+    h1_pair = all_same(h1_faces[0:2]) or all_same(h1_faces[1:3]) or all_same(h1_faces[2:4]) or all_same(h1_faces[3:5])
+    h2_pair = all_same(h2_faces[0:2]) or all_same(h2_faces[1:3]) or all_same(h2_faces[2:4]) or all_same(h2_faces[3:5])
+    if h1_pair and not h2_pair:
+        return 1
+    elif h2_pair and not h1_pair:
+        return 2
+    elif h1_pair and h2_pair:
+        if h1_faces == h2_faces:
+            return 0
+
+        if all_same(h1_faces[0:2]):
+            h1_rank = (h1_faces[0],h1_faces[4],h1_faces[3],h1_faces[2])
+        elif all_same(h1_faces[1:3]):
+            h1_rank = (h1_faces[1],h1_faces[4],h1_faces[3],h1_faces[0])
+        elif all_same(h1_faces[2:4]):
+            h1_rank = (h1_faces[2],h1_faces[4],h1_faces[1],h1_faces[0])
+        elif all_same(h1_faces[3:5]):
+            h1_rank = (h1_faces[3],h1_faces[2],h1_faces[1],h1_faces[0])
+
+        if all_same(h2_faces[0:2]):
+            h2_rank = (h2_faces[0],h2_faces[4],h2_faces[3],h2_faces[2])
+        elif all_same(h2_faces[1:3]):
+            h2_rank = (h2_faces[1],h2_faces[4],h2_faces[3],h2_faces[0])
+        elif all_same(h2_faces[2:4]):
+            h2_rank = (h2_faces[2],h2_faces[4],h2_faces[1],h2_faces[0])
+        elif all_same(h2_faces[3:5]):
+            h2_rank = (h2_faces[3],h2_faces[2],h2_faces[1],h2_faces[0])
+
+        return (h2_rank > h1_rank)+1
+
+    #check if nothing
+    if h1_faces == h2_faces:
+        return 0
+    else:
+        for i in [4,3,2,1,0]:
+            if h1_faces[i] != h2_faces[i]:
+                return (h2_faces[i] > h1_faces[i])+1
+
 def symbol_translator(x):
     face=['2','3','4','5','6','7','8','9','10','jack','queen','king','ace'][int(x/4)]
     suite = ['diamonds','clubs','hearts','spades'][x%4]
@@ -302,7 +466,19 @@ def is_terminal(h):
     _,_,preflop,flop = parse_history(h)
     return preflop[-2:]=="ff" or flop[-2:]=="cc" or flop[-2:]=="ff" or len(flop)==16
 
-CARDS=range(52)
+CARDS=[i for i in range(52)]
+CARDS_noflush = [int(i/4) for i in range(52)]
+
+def deal_cards_noflush(h):
+    s=""
+    if len(h) == 0:
+        shuffle(CARDS_noflush)
+        for i in range(4):
+            s += str(CARDS_noflush[i])
+    else:
+        for i in range(4,7):
+            s += str(CARDS_noflush[i])
+    return s
 
 def deal_cards(h):
     s=""
